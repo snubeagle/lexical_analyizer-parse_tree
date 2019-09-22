@@ -100,7 +100,7 @@ def lex(input):
             return (input, lexeme, lookup[lexeme])
 
     # TODO: anything else, raise an exception
-    raise Exception("Lexical Analyzer Error: unrecognized symbol was found!")
+    raise Exception("3 Lexical Error: unrecognized symbol was found!")
 
 # main
 if __name__ == "__main__":
