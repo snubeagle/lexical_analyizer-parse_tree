@@ -4,46 +4,50 @@
 import lex
 import syntax_tree
 import tree
+import sys
+from os import path
+from tree import Tree
 
-manager(i):
-    if i < 2:
-        raise ValueError"Invalid source file received"
+def manager(i):
+    output = []
+    if len(i) < 2:
+        raise ValueError("Invalid source file received")
 
-    if !path.exists(i[1]):
-        raise IOError"1 Source file missing"
-
-    try:
-         source = open(i[1], rt)
-    except Exception as e:
-        raise IOError"2 Couldnt open source file\confirm permissions on source file"
-
-    try:
-        grammar = open("grammar.txt", rt)
-    except Exception as e:
-        raise IOError"4 Couldnt open grammar file\nUnable to locate/validate grammar text file"
+    if not(path.exists(i[1])):
+        raise IOError("1 Source file missing")
 
     try:
-        gtable = open("grammar_v1.csv", rt)
+         source = open(i[1], 'rt')
     except Exception as e:
-        raise IOError"5 Couldnt open SLR table file\nUnable to locate/validate SLR table csv file"
+        raise IOError("2 Couldnt open source file\confirm permissions on source file")
+
+    try:
+        grammar = open("grammar.txt", 'rt')
+    except Exception as e:
+        raise IOError("4 Couldnt open grammar file\nUnable to locate/validate grammar text file")
+
+    try:
+        gtable = open("grammar_v2.csv", 'rt')
+    except Exception as e:
+        raise IOError("5 Couldnt open SLR table file\nUnable to locate/validate SLR table csv file")
 
     input = source.read()
     while(True):
-        input, lexeme, token = lex(input)
+        input, lexeme, token = lex.lex(input)
         if lexeme == None:
             break
         output.append((lexeme, token))
 
-    grammar = loadGrammar(grammar)
-    actions, gotos = loadTable(gtable)
+    grammar = syntax_tree.loadGrammar(grammar)
+    actions, gotos = syntax_tree.loadTable(gtable)
 
-    tree = parse(input, grammar, actions, gotos)
+    tree = syntax_tree.parse(input, grammar, actions, gotos)
     if tree:
         print("Input is syntactically correct!")
         print("Parse Tree:")
         tree.print()
     else:
-        raise SyntaxError"Syntax Error"
+        raise SyntaxError("Syntax Error")
 
 if __name__ == "__main__":
   manager(sys.argv)
