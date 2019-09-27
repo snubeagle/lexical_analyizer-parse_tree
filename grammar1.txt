@@ -1,0 +1,49 @@
+PR -> PROGRAM ID BL
+BL -> VDS
+BL -> CS
+VDS -> var VD
+VDS -> var VDM
+VDM -> VD VDM
+VDM -> ''
+VD -> ID : TY
+ID -> IDS
+IDS -> IDS ID
+IDS -> ''
+TY -> Integer
+TY -> Boolean
+CS -> begin ST end
+ST -> SiS ST
+ST -> SS ST
+ST -> ''
+SiS -> AS
+SiS -> RS
+SiS -> WS
+AS -> ID := EX
+RS -> read ID
+WS -> write ID
+WS -> write LI
+SS -> IS
+SS -> WS
+SS -> CS
+IS -> If BE then ST
+IS -> else ST
+WS -> while BE do ST
+EX -> AE
+EX -> BE
+AE -> AE + T 
+AE -> AE - T 
+AE -> T
+T -> T * F 
+T -> F
+F -> ID
+F -> IL
+LI -> IL
+LI -> BL
+BL -> true 
+BL -> false
+BE -> BL
+BE -> AE < AE
+BE -> AE > AE
+BE -> AE <= AE
+BE -> AE >= AE
+BE -> AE = AE

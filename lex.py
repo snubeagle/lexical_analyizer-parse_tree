@@ -28,7 +28,7 @@ def getChar(input):
         return (c, CharClass.QUOTE)
     if c in ['+', '-', '*', '/', '>', '=', '<']:
         return (c, CharClass.OPERATOR)
-    if c in ['.', ':', ',', ';']:
+    if c in ['.', ':', ',', ';', ':=']:
         return (c, CharClass.PUNCTUATOR)
     if c in [' ', '\n', '\t']:
         return (c, CharClass.BLANK)
@@ -59,6 +59,13 @@ class Token(Enum):
     DIV_OP     = 4
     IDENTIFIER = 5
     LITERAL    = 6
+    PROGRAM    = 7
+    VAR        = 8
+    BEGIN      = 9
+    END        = 10
+    Integer    = 11
+    Write      = 12
+    Assign     = 13
 
 # lexeme to token conversion
 lookup = {
@@ -70,6 +77,7 @@ lookup = {
 
 # returns the next (lexeme, token) pair or None if EOF is reached
 def lex(input):
+    map = {'program': Token.PROGRAM}
     input = getNonBlank(input)
 
     c, charClass = getChar(input)
@@ -81,8 +89,15 @@ def lex(input):
 
     # TODO: reading letters
     if charClass == CharClass.LETTER:
-        input, lexeme = addChar(input, lexeme)
-        return (input, lexeme, Token.IDENTIFIER)
+        while charClass != charClass.BLANK:
+            input, lexeme = addChar(input, lexeme)
+            c, charClass = getChar(input)
+        if lexeme == 'program':
+            return (input, lexeme, Token.PROGRAM)
+        elif lexeme == 'Integer':
+            return (input, lexeme, Token.Integer)
+        else:
+            return (input, lexeme, Token.IDENTIFIER)
 
     # TODO: reading digits
     if charClass == CharClass.DIGIT:
@@ -100,6 +115,14 @@ def lex(input):
             return (input, lexeme, lookup[lexeme])
 
     # TODO: anything else, raise an exception
+    if charClass == CharClass.PUNCTUATOR:
+        input, lexeme = addChar(input, lexeme)
+        c, charClass = getChar(input)
+        if c == "=":
+            input, lexeme = addChar(input, lexeme)
+        return (input, lexeme, Token.Assign)
+
+
     raise Exception("3 Lexical Error: unrecognized symbol was found!")
 
 # main
