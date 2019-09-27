@@ -70,10 +70,13 @@ def printGotos(gotos):
 
 # given an input (source program), grammar, actions, and gotos, returns true/false depending whether the input should be accepted or not
 def parse(input, grammar, actions, gotos):
+    convert = {
+        'PROGRAM'    : 'program',
+        'IDENTIFIER' : 'ID'
+    }
 
     # TODOd #1: create a list of trees
     trees = []
-
     stack = []
     stack.append(0)
     while True:
@@ -82,22 +85,32 @@ def parse(input, grammar, actions, gotos):
         print("input: ", end = "")
         print(input, end = " ")
         state = stack[-1]
-        token = input[0]
+        token = convert[input[0][1].name]
+        print(token)
         action = actions[(state, token)]
-        print("action: ", end = "")
-        print(action)
+        #print("action: ", end = "")
+        #print(action)
 
         if action is None:
             return None  # tree building update
 
         # shift operation
-        if action[0] == 's':
+        if action[0] == 's' or action[0].isdigit():
             input.pop(0)
             stack.append(token)
             state = int(action[1])
             stack.append(state)
 
             # TODOd #2: create a new tree, set data to token, and append it to the list of trees
+            tree = Tree()
+            tree.data = token
+            trees.append(tree)
+
+        # reading identifiers
+        elif action[0].isdigit():
+            input.pop(0)
+            stack.append(token)
+            stack.append(action)
             tree = Tree()
             tree.data = token
             trees.append(tree)
@@ -129,6 +142,8 @@ def parse(input, grammar, actions, gotos):
 
         # not a shift or reduce operation, must be an "accept" operation
         else:
+            print("\nnot shift of reduce operation")
+            print(action)
             production = grammar[0]
             lhs = getLHS(production)
             rhs = getRHS(production)
@@ -147,7 +162,7 @@ if __name__ == "__main__":
 
     input = open("grammar.txt", "rt")
     grammar = loadGrammar(input)
-    printGrammar(grammar)
+    #printGrammar(grammar)
     input.close()
 
     input = open("grammar_v1.csv", "rt")
