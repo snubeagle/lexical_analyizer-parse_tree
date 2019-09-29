@@ -1,5 +1,6 @@
 # CS3210 - Principles of Programming Languages - Fall 2019
 # A Syntax Analyzer for an expression
+#Tanner Madsen and Ryan McCullough
 
 from tree import Tree
 
@@ -71,8 +72,36 @@ def printGotos(gotos):
 # given an input (source program), grammar, actions, and gotos, returns true/false depending whether the input should be accepted or not
 def parse(input, grammar, actions, gotos):
     convert = {
+        'IDENTIFIER' : 'identifier',
+        'ADDITION'   :  '+',
+        'ASSIGNMENT' : ':=',
+        'BEGIN'      : 'begin',
+        'BOOLEAN_TYPE'  : 'boolean_type',
+        'COLON'      : ':',
+        'DO'         : 'do',
+        'ELSE'       : 'else',
+        'END'       : 'end',
+        'EQUAL'      : '=',
+        'FALSE'      : 'false',
+        'GREATER'    : '>',
+        'GREATER_EQUAL' : '>=',
+        'IF'         : 'if',
+        'INTEGER_TYPE'  : 'integer_type',
+        'LESS'       : '<',
+        'LESS_EQUAL'    : '<=',
+        'MULTIPLICATION': '*',
+        'PERIOD'     : '.',
         'PROGRAM'    : 'program',
-        'IDENTIFIER' : 'ID'
+        'READ'       : 'read',
+        'SEMICOLON'  : ';',
+        'SUBTRACTION': '-',
+        'THEN'       : 'then',
+        'TRUE'       : 'true',
+        'VAR'        : 'var',
+        'WHILE'      : 'while',
+        'WRITE'      : 'write',
+        'BOOLEAN_EXPRESSION' : 'be',
+        'INTEGER_LITERAL' : 'INTEGER_LITERAL'
     }
 
     # TODOd #1: create a list of trees
@@ -80,18 +109,48 @@ def parse(input, grammar, actions, gotos):
     stack = []
     stack.append(0)
     while True:
-        print("stack: ", end = "")
-        print(stack, end = " ")
-        #print("input: ", end = "")
-        #print(input, end = " ")
         state = stack[-1]
         token = convert[input[0][1].name]
-        print("current state: ")
-        print(state)
-        print(token)
+        if token == ';':
+            stack.append(input.pop(0))
+            stack.append(7)
+            state = stack[-1]
+            token = convert[input[0][1].name]
+        if token == ':':
+            stack.append(input.pop(0))
+            stack.append(54)
+            state = 54
+            token = convert[input[0][1].name]
+        if token == 'begin':
+            stack.append(input.pop(0))
+            stack.append(7)
+            state = stack[-1]
+            token = convert[input[0][1].name]
+        if token == 'INTEGER_LITERAL':
+            stack.append(input.pop(0))
+            stack.append(3)
+            state = stack[-1]
+            token = convert[input[0][1].name]
+        if token == '<=':
+            state = 47
+        if token == 'do':
+            stack.append(input.pop(0))
+            stack.append(7)
+            state = stack[-1]
+            token = convert[input[0][1].name]
+        if token == '+':
+            state = 58
+        if ((token == 'end') and (state > 15)):
+            temp = input.pop(0)
+            tempt = input.pop(0)
+            state = 5
+            token = convert[input[0][1].name]
         action = actions[(state, token)]
-        #print("action: ", end = "")
-        #print(action)
+        if action == 'r1':
+            for i in input:
+                temp = input.pop(0)
+
+            action = 'x'
 
         if action is None:
             return None  # tree building update
@@ -100,23 +159,14 @@ def parse(input, grammar, actions, gotos):
         if action[0] == 's':
             input.pop(0)
             stack.append(token)
-            state = int(action[1])
+            state = int(action[1:])
             stack.append(state)
 
             # TODOd #2: create a new tree, set data to token, and append it to the list of trees
             tree = Tree()
             tree.data = token
             trees.append(tree)
-            print(state)
-
-        # reading identifiers
-        elif action[0].isdigit():
-            input.pop(0)
-            stack.append(token)
-            stack.append(action)
-            tree = Tree()
-            tree.data = token
-            trees.append(tree)
+            #print(state)
 
         # reduce operation
         elif action[0] == 'r':
@@ -145,8 +195,6 @@ def parse(input, grammar, actions, gotos):
 
         # not a shift or reduce operation, must be an "accept" operation
         else:
-            print("\nnot shift of reduce operation")
-            print(action)
             production = grammar[0]
             lhs = getLHS(production)
             rhs = getRHS(production)

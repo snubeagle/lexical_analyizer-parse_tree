@@ -1,5 +1,6 @@
 # CS3210 - Principles of Programming Languages - Fall 2019
 # A Lexical Analyzer for an expression
+#Tanner Madsen and Ryan McCullough
 
 from enum import Enum
 import sys
@@ -28,7 +29,7 @@ def getChar(input):
         return (c, CharClass.QUOTE)
     if c in ['+', '-', '*', '/', '>', '=', '<']:
         return (c, CharClass.OPERATOR)
-    if c in ['.', ':', ',', ';', ':=']:
+    if c in ['.', ':', ',', ';']:
         return (c, CharClass.PUNCTUATOR)
     if c in [' ', '\n', '\t']:
         return (c, CharClass.BLANK)
@@ -83,6 +84,7 @@ class Token(Enum):
     WHILE      = 28
     WRITE      = 29
     BLOCK      = 30
+    LITERAL    = 32
 
 ab = {
     'ADDITION':Token.ADDITION,
@@ -112,7 +114,8 @@ ab = {
     'TRUE':Token.TRUE,
     'VAR':Token.VAR,
     'WHILE':Token.WHILE,
-    'WRITE':Token.WRITE
+    'WRITE':Token.WRITE,
+    'LITERAL':Token.LITERAL
 }
 
 # lexeme to token conversion
@@ -153,6 +156,7 @@ lookup = {
 
 # returns the next (lexeme, token) pair or None if EOF is reached
 def lex(input):
+    bad_chars = ['.', ';', ':']
     input = getNonBlank(input)
 
     c, charClass = getChar(input)
@@ -164,17 +168,16 @@ def lex(input):
 
     # TODO: reading letters
     if charClass == CharClass.LETTER:
-        while charClass != charClass.BLANK:
+        while ((c not in bad_chars) and (charClass != charClass.BLANK)):
             input, lexeme = addChar(input, lexeme)
             c, charClass = getChar(input)
-        #print(lexeme)
-        if lexeme in ab:
-            token = ab[lexeme]
+        if lexeme.upper() in ab:
+            token = ab[lexeme.upper()]
         else:
             token = Token.IDENTIFIER
-        if lexeme == "INTEGER":
+        if ((lexeme == "INTEGER") or (lexeme == "integer")):
             token = Token.INTEGER_TYPE
-        if lexeme == "END.":
+        if ((lexeme == "END") or (lexeme == 'end')):
             token = Token.END
         return (input, lexeme, token)
 
@@ -186,22 +189,35 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT:
                 break
-        return (input, lexeme, Token.LITERAL)
+        return (input, lexeme, Token.INTEGER_LITERAL)
 
     # TODO: reading an operator
     if charClass == CharClass.OPERATOR:
+        if ((c == '<') or (c == '>')):
+            input, lexeme = addChar(input, lexeme)
+            c, charClass = getChar(input)
+            if c == "=":
+                input, lexeme = addChar(input, lexeme)
+                return (input, lexeme, lookup[lexeme])
+            else:
+                return (input, lexeme, lookup[lexeme])
         input, lexeme = addChar(input, lexeme)
         if lexeme in lookup:
             return (input, lexeme, lookup[lexeme])
 
     # TODO: anything else, raise an exception
     if charClass == CharClass.PUNCTUATOR:
-        input, lexeme = addChar(input, lexeme)
-        c, charClass = getChar(input)
-        if c == "=":
+        if c == ":":
             input, lexeme = addChar(input, lexeme)
-        return (input, lexeme, Token.ASSIGNMENT)
-
+            c, charClass = getChar(input)
+            if c == "=":
+                input, lexeme = addChar(input, lexeme)
+                return (input, lexeme, Token.ASSIGNMENT)
+            else:
+                return (input, lexeme, Token.COLON)
+        else:
+            input, lexeme = addChar(input, lexeme)
+            return (input, lexeme, lookup[lexeme])
 
     raise Exception("3 Lexical Error: unrecognized symbol was found!")
 
