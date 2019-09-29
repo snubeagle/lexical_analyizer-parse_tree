@@ -82,10 +82,12 @@ def parse(input, grammar, actions, gotos):
     while True:
         print("stack: ", end = "")
         print(stack, end = " ")
-        print("input: ", end = "")
-        print(input, end = " ")
+        #print("input: ", end = "")
+        #print(input, end = " ")
         state = stack[-1]
         token = convert[input[0][1].name]
+        print("current state: ")
+        print(state)
         print(token)
         action = actions[(state, token)]
         #print("action: ", end = "")
@@ -95,7 +97,7 @@ def parse(input, grammar, actions, gotos):
             return None  # tree building update
 
         # shift operation
-        if action[0] == 's' or action[0].isdigit():
+        if action[0] == 's':
             input.pop(0)
             stack.append(token)
             state = int(action[1])
@@ -105,6 +107,7 @@ def parse(input, grammar, actions, gotos):
             tree = Tree()
             tree.data = token
             trees.append(tree)
+            print(state)
 
         # reading identifiers
         elif action[0].isdigit():

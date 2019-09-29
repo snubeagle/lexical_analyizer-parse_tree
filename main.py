@@ -38,7 +38,7 @@ def manager(i):
             break
         output.append((lexeme, token))
 
-    #print(len(output))
+    print(len(output))
 
     grammar = syntax_tree.loadGrammar(grammar)
     actions, gotos = syntax_tree.loadTable(gtable)
@@ -47,7 +47,7 @@ def manager(i):
     #syntax_tree.printActions(actions)
     #syntax_tree.printGotos(gotos)
 
-    tree = syntax_tree.parse(output, grammar, actions, gotos)
+    #tree = syntax_tree.parse(output, grammar, actions, gotos)
 """
     if tree:
         print("Input is syntactically correct!")
