@@ -53,31 +53,106 @@ def addChar(input, lexeme):
 
 # all tokens
 class Token(Enum):
-    ADD_OP     = 1
-    SUB_OP     = 2
-    MUL_OP     = 3
-    DIV_OP     = 4
-    IDENTIFIER = 5
-    LITERAL    = 6
-    PROGRAM    = 7
-    VAR        = 8
-    BEGIN      = 9
-    END        = 10
-    Integer    = 11
-    Write      = 12
-    Assign     = 13
+    ADDITION   = 1
+    ASSIGNMENT = 2
+    BEGIN      = 3
+    BOOLEAN_TYPE = 4
+    COLON      = 5
+    DO         = 6
+    ELSE       = 7
+    END        = 31
+    EQUAL      = 9
+    FALSE      = 10
+    GREATER    = 11
+    GREATER_EQUAL = 12
+    IDENTIFIER = 13
+    IF         = 14
+    INTEGER_LITERAL = 15
+    INTEGER_TYPE = 16
+    LESS       = 17
+    LESS_EQUAL = 18
+    MULTIPLICATION = 19
+    PERIOD     = 20
+    PROGRAM    = 21
+    READ       = 22
+    SEMICOLON  = 23
+    SUBTRACTION = 24
+    THEN       = 25
+    TRUE       = 26
+    VAR        = 27
+    WHILE      = 28
+    WRITE      = 29
+    BLOCK      = 30
+
+ab = {
+    'ADDITION':Token.ADDITION,
+    'ASSIGNMENT':Token.ASSIGNMENT,
+    'BEGIN' :Token.BEGIN,
+    'BOOLEAN_TYPE':Token.BOOLEAN_TYPE,
+    'COLON':Token.COLON,
+    'DO':Token.DO,
+    'ELSE':Token.ELSE,
+    'END.':Token.END,
+    'EQUAL':Token.EQUAL,
+    'FALSE':Token.FALSE,
+    'GREATER':Token.GREATER,
+    'GREATER_EQUAL':Token.GREATER_EQUAL,
+    'IDENTIFIER':Token.IDENTIFIER,
+    'IF':Token.IF,
+    'INTEGER_TYPE':Token.INTEGER_TYPE,
+    'LESS':Token.LESS,
+    'LESS_EQUAL':Token.LESS_EQUAL,
+    'MULTIPLICATION':Token.MULTIPLICATION,
+    'PERIOD':Token.PERIOD,
+    'PROGRAM':Token.PROGRAM,
+    'READ':Token.READ,
+    'SEMICOLON':Token.SEMICOLON,
+    'SUBTRACTION':Token.SUBTRACTION,
+    'THEN':Token.THEN,
+    'TRUE':Token.TRUE,
+    'VAR':Token.VAR,
+    'WHILE':Token.WHILE,
+    'WRITE':Token.WRITE
+}
 
 # lexeme to token conversion
 lookup = {
-    "+"      : Token.ADD_OP,
-    "-"      : Token.SUB_OP,
-    "*"      : Token.MUL_OP,
-    "/"      : Token.DIV_OP
+    "+"      : Token.ADDITION,
+    "-"      : Token.SUBTRACTION,
+    ""      : Token.MULTIPLICATION,
+    "PR"     : Token.PROGRAM,
+    "ASSIGNMENT" : Token.ASSIGNMENT,
+    "BEGIN"  : Token.BEGIN,
+    "BOOLEAN_TYPE" :Token.BOOLEAN_TYPE,
+    ":"      : Token.COLON,
+    "DO"     : Token.DO,
+    "ELSE"   : Token.ELSE,
+    "END"    : Token.END,
+    "="      : Token.EQUAL,
+    "FALSE"  : Token.FALSE,
+    ">"      : Token.GREATER,
+    ">="     : Token.GREATER_EQUAL,
+    "ID"     : Token.IDENTIFIER,
+    "IF"     : Token.IF,
+    "IL"     : Token.INTEGER_LITERAL,
+    "INT_TYPE": Token.INTEGER_TYPE,
+    "<"      : Token.LESS,
+    "<="     : Token.LESS_EQUAL,
+    ""      : Token.MULTIPLICATION,
+    "."      : Token.PERIOD,
+    "PROGRAM"     : Token.PROGRAM,
+    "READ"   : Token.READ,
+    ";"      : Token.SEMICOLON,
+    "-"      : Token.SUBTRACTION,
+    "THEN"   : Token.SUBTRACTION,
+    "TRUE"   : Token.TRUE,
+    "VAR"    : Token.VAR,
+    "WHILE"  : Token.WHILE,
+    "WRITE"  : Token.WRITE
 }
 
 # returns the next (lexeme, token) pair or None if EOF is reached
 def lex(input):
-    map = {'program': Token.PROGRAM}
     input = getNonBlank(input)
 
     c, charClass = getChar(input)
@@ -92,12 +167,17 @@ def lex(input):
         while charClass != charClass.BLANK:
             input, lexeme = addChar(input, lexeme)
             c, charClass = getChar(input)
-        if lexeme == 'program':
-            return (input, lexeme, Token.PROGRAM)
-        elif lexeme == 'Integer':
-            return (input, lexeme, Token.Integer)
+        #print(lexeme)
+        if lexeme in ab:
+            token = ab[lexeme]
         else:
-            return (input, lexeme, Token.IDENTIFIER)
+            token = Token.IDENTIFIER
+        if lexeme == "INTEGER":
+            token = Token.INTEGER_TYPE
+        if lexeme == "END.":
+            token = Token.END
+        return (input, lexeme, token)
+
 
     # TODO: reading digits
     if charClass == CharClass.DIGIT:
@@ -120,7 +200,7 @@ def lex(input):
         c, charClass = getChar(input)
         if c == "=":
             input, lexeme = addChar(input, lexeme)
-        return (input, lexeme, Token.Assign)
+        return (input, lexeme, Token.ASSIGNMENT)
 
 
     raise Exception("3 Lexical Error: unrecognized symbol was found!")
